@@ -12,13 +12,13 @@
 jmp_buf g_jmp;
 JNIEnv* g_env;
 
-void handler(int sig)
+static void handler(int sig)
 {
     jclass exception;
+    
+    signal(sig, SIG_IGN);
 
     LOGD("SIGSEGV!");
-
-    signal(sig, SIG_IGN);
 
     exception = (*g_env)->FindClass(g_env, "java/lang/RuntimeException");
     if (exception != NULL) {
@@ -28,16 +28,19 @@ void handler(int sig)
     }
 }
 
-void Java_jp_s5r_android_signal_TestActivity_nativeMethod(JNIEnv* env, jobject thiz)
+static void register_handler(JNIEnv* env)
 {
-    int ret = 0;
-    int* i;
-
     g_env = env;
     signal(SIGSEGV, &handler);
+}
 
-    ret = setjmp(g_jmp);
-    if (ret == 0) {
+void Java_jp_s5r_android_signal_TestActivity_nativeMethod(JNIEnv* env, jobject thiz)
+{
+    int* i;
+
+    register_handler(env);
+    if (setjmp(g_jmp) == 0) {
         *i = 10;
     }
 }
+
