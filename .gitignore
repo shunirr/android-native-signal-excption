@@ -1,0 +1,11 @@
+.DS_Store
+*.swp
+*.iml
+*.ipr
+*.iws
+obj/
+out/
+bin/
+gen/
+libs/armeabi/libtest.so
+local.properties
